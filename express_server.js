@@ -39,8 +39,17 @@ app.get("/set", (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
+//Route parameters - to capture the values specified at their position in the URL. 
+// The captured values are populated in the req.params object, with the name of the route parameter specified in the path as their respective keys
+app.get("/urls/:shortURL", (req, res) => {
+  let templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL };
+  res.render("urls_show", templateVars);
+});
 
-
+app.get("/urls/:longURL", (req, res) => {
+  let templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL };
+  res.render("urls_show", templateVars);
+});
 // When sending variables to an EJS template, we need to send them inside an object, even if we are only sending one variable.
 // <%= %> syntax, we tell EJS that we want the result of this code to show up on our page. I
 // <% %> <!-- This line will not show up on the page -->
