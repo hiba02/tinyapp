@@ -61,7 +61,18 @@ app.get("/urls/:longURL", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  console.log(req);  // Log the POST request body to the console
+  console.log(req.body);  // Log the POST request body to the console 
+  //{ longURL: 'Hello World' }  longURL --> name in html form tag, 'Hello World' --> content    
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
+
+//https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+function generateRandomString() {
+  let result           = '';
+  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+  for ( var i = 0; i < 6; i++ ) {
+     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
