@@ -84,13 +84,16 @@ app.post("/urls", (req, res) => {
 Add a POST route that removes a URL resource: POST /urls/:shortURL/delete
 */
 app.post("/urls/:shortURL/delete", (req, res) => {
-  console.log("req.params.shortURL", req.params.shortURL);
   delete urlDatabase[req.params.shortURL];
-  console.log(urlDatabase);
-  //console.log(req.body);
   res.redirect('/urls');
 });
 
+//Updating URLs
+app.post("/urls/:shortURL/update", (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.updateLongURL;
+  console.log(urlDatabase);
+  res.redirect('/urls');
+});
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
@@ -98,4 +101,14 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+//Updating URLs
+app.post("/urls/:shortURL", (req, res) => {
+  // console.log("req.params.shortURL", req.params.shortURL);
+
+  let templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL]
+  };
+  res.render("urls_show", templateVars);
+});
 
