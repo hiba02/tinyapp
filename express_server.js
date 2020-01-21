@@ -30,17 +30,22 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
 
 
+
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
+
+//http://www.localhost:8080/urls
 app.get("/urls", (req, res) => {
   // use res.render() to pass the URL data to our template.
   let templateVars = { urls: urlDatabase };
-  console.log(templateVars);
+  // console.log(templateVars);
   res.render("urls_index", templateVars);
 });
+
+
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -65,7 +70,7 @@ app.get("/urls/:longURL", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  // console.log(req.body);  // Log the POST request body to the console
   //{ longURL: 'Hello World' }  longURL --> name in html form tag, 'Hello World' --> content
   // urlDatabase
   const randomShortURL = generateRandomString();
@@ -75,10 +80,22 @@ app.post("/urls", (req, res) => {
   res.redirect(301, `/u/${randomShortURL}`);
 });
 
+/* 
+Add a POST route that removes a URL resource: POST /urls/:shortURL/delete
+*/
+app.post("/urls/:shortURL/delete", (req, res) => {
+  console.log("req.params.shortURL", req.params.shortURL);
+  delete urlDatabase[req.params.shortURL];
+  console.log(urlDatabase);
+  //console.log(req.body);
+  res.redirect('/urls');
+});
+
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
   res.redirect(longURL);
 });
+
 
