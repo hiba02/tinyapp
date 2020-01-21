@@ -71,26 +71,14 @@ app.post("/urls", (req, res) => {
   const randomShortURL = generateRandomString();
   const receivedLongURL = req.body.longURL;
   urlDatabase[randomShortURL] = receivedLongURL;
-  console.log(urlDatabase);
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
-  res.redirect(301, `/u/:${randomShortURL}`);
+  res.redirect(301, `/u/${randomShortURL}`);
 });
 
-// ????????????????????????????????????????????????????
-// ???  http://localhost:8080/u/b2xVn2 did not work ???
-// ???  http://localhost:8080/u/:b2xVn2 working ???
+
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  console.log("shortURL: ", shortURL);
-  console.log("urlDatabase: ", urlDatabase);
-  let shortURLnoColon = '';
-  for (let i = 1; i < shortURL.length; i++) {
-    shortURLnoColon += shortURL[i];
-  }
-  // console.log("shortURLnoColon: ", shortURLnoColon);
-  // console.log("urlDatabase[shortURLnoColon] "+urlDatabase[shortURLnoColon]);
-  const longURL = urlDatabase[shortURLnoColon];
-  console.log('longURL: ', longURL);
+  const longURL = urlDatabase[shortURL];
   res.redirect(longURL);
 });
 
