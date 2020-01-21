@@ -1,6 +1,8 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 const PORT = 8080; // default port 8080
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
@@ -39,21 +41,20 @@ app.get("/set", (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
 //Route parameters - to capture the values specified at their position in the URL. 
 // The captured values are populated in the req.params object, with the name of the route parameter specified in the path as their respective keys
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: 'b2xVn2', longURL: '9sm5xK' };
-  console.log(req.params.shortURL);
-  console.log(templateVars.shortURL);
-  console.log(templateVars);
   res.render("urls_show", templateVars);
 });
 
 app.get("/urls/:longURL", (req, res) => {
   let templateVars = { shortURL: 'b2xVn2', longURL: '9sm5xK' };
-  console.log(req.params.shortURL);
-  console.log(templateVars.shortURL);
-  console.log(templateVars);
   res.render("urls_show", templateVars);
 });
 
