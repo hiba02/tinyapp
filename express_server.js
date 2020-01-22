@@ -104,8 +104,13 @@ app.post("/urls", (req, res) => {
   const randomShortURL = generateRandomString();
   const receivedLongURL = req.body.longURL;
   urlDatabase[randomShortURL] = receivedLongURL;
+
+  console.log("randomShortURL ",randomShortURL);
+  console.log("receivedLongURL  ",receivedLongURL);
+  console.log("urlDatabase[randomShortURL]  ",urlDatabase[randomShortURL]);
+
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
-  res.redirect(301, `/u/${randomShortURL}`);
+  res.redirect(`/urls`);
 });
 
 /* 
