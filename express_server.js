@@ -33,33 +33,20 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-
-
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
 //http://www.localhost:8080/urls
 app.get("/urls", (req, res) => {
-  // use res.render() to pass the URL data to our template.
+
   let templateVars = { 
     username: req.cookies["username"],
     urls: urlDatabase 
   };
   console.log("req.cookies['username']", req.cookies["username"]);
-  // console.log("req.cookies['username']", req.cookies["username"]);
+
   if(templateVars["username"]) {
     console.log(templateVars["username"]);
   } else {
     console.log('hi');
   }
-  // console.log(templateVars[username]);
-  // if (templateVars[username]) {
-  //   console.log(templateVars);
-  // } else if (templateVars[username] === "undefined") {
-  //   console.log("no user");
-  // }
  
   res.render("urls_index", templateVars);
 });
@@ -75,8 +62,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-//Route parameters - to capture the values specified at their position in the URL.
-// The captured values are populated in the req.params object, with the name of the route parameter specified in the path as their respective keys
+
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     username: req.cookies["username"],
@@ -97,10 +83,10 @@ app.get("/urls/:longURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+
+// Post for create new URL
 app.post("/urls", (req, res) => {
-  // console.log(req.body);  // Log the POST request body to the console
-  //{ longURL: 'Hello World' }  longURL --> name in html form tag, 'Hello World' --> content
-  // urlDatabase
+
   const randomShortURL = generateRandomString();
   const receivedLongURL = req.body.longURL;
   urlDatabase[randomShortURL] = receivedLongURL;
@@ -109,7 +95,6 @@ app.post("/urls", (req, res) => {
   console.log("receivedLongURL  ",receivedLongURL);
   console.log("urlDatabase[randomShortURL]  ",urlDatabase[randomShortURL]);
 
-  // res.send("Ok");         // Respond with 'Ok' (we will replace this)
   res.redirect(`/urls`);
 });
 
@@ -183,3 +168,8 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls');
   
 });
+
+
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
