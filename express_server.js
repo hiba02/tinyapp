@@ -65,9 +65,14 @@ app.get("/urls", (req, res) => {
 });
 
 
-
+//urls_new for create New URL
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    username: req.cookies["username"],
+    shortURL: 'b2xVn2',
+    longURL: '9sm5xK'
+  };
+  res.render("urls_new", templateVars);
 });
 
 //Route parameters - to capture the values specified at their position in the URL.
@@ -84,9 +89,11 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls/:longURL", (req, res) => {
   let templateVars = {
     username: req.cookies["username"],
+    urls: urlDatabase, 
     shortURL: 'b2xVn2',
     longURL: '9sm5xK'
   };
+
   res.render("urls_show", templateVars);
 });
 
