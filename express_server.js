@@ -9,17 +9,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+app.get("/", (req, res) => {
+  res.send("Hello!");
+});
+
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
+  JslMgd: {longURL: "https://www.cnn.com", userID: "JslMgd" }
 };
+
 
 const users = {
   "userRandomID": {
@@ -42,47 +50,50 @@ const generateRandomString = function () {
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let charactersLength = characters.length;
   for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    if (i === 0) {
+      let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    } else {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
   }
   return result;
 };
-
-
 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+const urlsForUserID = function (currentCookieID) {
+  const urlsUserID = urlDatabase[currentCookieID];
+  console.log(urlsUserID);
+  return urlsUserID;
+};
+
+
+// '/urls'
 //http://www.localhost:8080/urls
 app.get("/urls", (req, res) => {
   let currentCookieID = req.cookies["user_id"];
   console.log('urls currentCookieID', currentCookieID);
-  if (currentCookieID) {
+  if (req.cookies["user_id"]) {
     let templateVars = {
       username: req.cookies["user_id"],
       urls: urlDatabase,
       user: currentCookieID,
       email: users[currentCookieID].email
     };
-    console.log('currentCookieID:  ', currentCookieID);
-    console.log("/ruls req.body ", users[currentCookieID]);
-    console.log("req.cookies[user_id].email", users[currentCookieID].email);
+    urlsForUserID(currentCookieID);
+    // console.log('currentCookieID:  ', currentCookieID);
+    // console.log("/ruls req.body ", users[currentCookieID]);
+    // console.log("req.cookies[user_id].email", users[currentCookieID].email);
     res.render("urls_index", templateVars);
   } else {
     console.log('currentCookieID: ', currentCookieID);
-    res.redirect('/register');
+    res.redirect('/login');
   }
-  
-  //console.log('users', users)
-  //console.log('users[currentCookieID].email', users[currentCookieID].email)
-
-
-  // if(templateVars["username"]) {
-  //   console.log(templateVars["username"]);
-  // } else {
-  //   console.log('hi');
-  // }
 
 });
 
@@ -237,6 +248,8 @@ app.post("/logout", (req, res) => {
 app.get("/register", (req, res) => {
   if (req.cookies["user_id"]) {
     let currentCookieID = req.cookies["user_id"];
+    console.log('req.cookies["user_id"]', req.cookies["user_id"]);
+    console.log('users', users);
     let templateVars = {
       user: req.cookies["user_id"],
       email: users[currentCookieID].email,
