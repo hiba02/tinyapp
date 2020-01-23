@@ -3,6 +3,13 @@ const bodyParser = require("body-parser");
 const app = express();
 var cookieParser = require('cookie-parser')
 app.use(cookieParser());
+const bcrypt = require('bcrypt');
+
+
+
+
+
+
 
 const PORT = 8080; // default port 8080
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,18 +40,13 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
-  },  
-  "qqqMgd": {
-    id: "qqqMgd",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  },
+    password: bcrypt.hashSync("dishwasher-funk", 10)
+  }
 }
 
 
@@ -123,7 +125,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let currentCookieID = req.cookies["user_id"];
-  // if current cookie user_id = uurlDatabase[:shortUTR].userID
+  // if current cookie user_id = urlDatabase[:shortUTR].userID
   if (users[currentCookieID] === urlDatabase[req.params.shortURL].userID) {
     let templateVars = {
       user: req.cookies["user_id"],
@@ -308,12 +310,16 @@ const users = {
 }
 */
 
+//bcrypt.hashSync(req.body.password, 10)
+
+
 // register - POST
 // produce new user ID and put it in usrs object
 // send cookie with new user ID
 // if -> check email exist or not
 app.post("/register/process", (req, res) => {
-  if (!req.body.email || !req.body.password) {
+  const hashPassword = bcrypt.hashSync(req.body.password, 10);
+  if (!req.body.email || !hashPassword) {
     console.log(req.body.email);
     return res.status(404).send(`<h1>Please enter email and password.</h1>`);
   }
@@ -322,7 +328,7 @@ app.post("/register/process", (req, res) => {
   newUser = {
     id: user_id,
     email: req.body.email,
-    password: req.body.password
+    password: hashPassword
   }
   users[user_id] = newUser;
   console.log(users);
@@ -348,15 +354,19 @@ app.get("/login", (req, res) => {
 match email address
 */
 app.post("/login", (req, res) => {
-  if (!req.body.email || !req.body.password) {
+  // hash
+  
+  const hashPassword = bcrypt.hashSync(req.body.password, 10);
+  if (!req.body.email || !hashPassword) {
     console.log(req.body.email);
     return res.status(404).send(`<h2>Please enter email and password.</h2>`);
   }
-  console.log('req.body.email, req.body.password', req.body.email, req.body.password)
+  console.log('req.body.email, req.body.password', req.body.email, hashPassword)
   console.log('/login Post usrs: ', users);
   let loggedUserId = '';
-  for (const eachUsr in users) {  
-    if (users[eachUsr].email === req.body.email && users[eachUsr].password === req.body.password) {
+  for (const eachUsr in users) {
+    // eq.body.password commes from user input (form tag)  
+    if (users[eachUsr].email === req.body.email && bcrypt.compareSync(req.body.password, users[eachUsr].password)) {
       loggedUserId = eachUsr;
     }
   }

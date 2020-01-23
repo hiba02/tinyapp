@@ -1,3 +1,4 @@
 node_modules/
 chicken
-backup.html
+views/partials/backup.html
+views/partials/test.js
