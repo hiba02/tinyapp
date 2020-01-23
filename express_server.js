@@ -61,7 +61,6 @@ const generateRandomString = function () {
     } else {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-
   }
   return result;
 };
@@ -117,19 +116,8 @@ app.get("/urls/new", (req, res) => {
     }
     res.render("urls_new", templateVars);
   } else {
-    // let templateVars = {
-    //   user: false,
-    //   email: null,
-    //   urls: urlDatabase,
-    //   shortURL: 'b2xVn2',
-    //   longURL: '9sm5xK'
-    // }
-
-    // res.render("urls_new", templateVars);
-    res.redirect('/login');
+  res.redirect('/login');
   }
-
-
 });
 
 
@@ -203,19 +191,11 @@ app.post("/urls", (req, res) => {
   // urlDatabase[randomShortURL].longURL = receivedLongURL;
   let currentCookieID = req.cookies["user_id"];
   // urlDatabase[randomShortURL].userID = currentCookieID;
-  console.log('randomShortURL: ', randomShortURL);
-  console.log('receivedLongURL: ', receivedLongURL);
 
   urlDatabase[randomShortURL] = {
     longURL: receivedLongURL,
     userID: currentCookieID
   };
-
-
-  console.log("randomShortURL ", randomShortURL);
-  console.log("receivedLongURL  ", receivedLongURL);
-  console.log("urlDatabase  ", urlDatabase);
-
   res.redirect(`/urls`);
 });
 
@@ -226,6 +206,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
 });
+
 //Updating URLs
 app.post("/urls/:shortURL/update", (req, res) => {
   urlDatabase[req.params.shortURL].longURL = req.body.updateLongURL;
@@ -242,7 +223,6 @@ app.get("/u/:shortURL", (req, res) => {
 //Updating URLs
 app.post("/urls/:shortURL", (req, res) => {
   // console.log("req.params.shortURL", req.params.shortURL);
-
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
@@ -282,7 +262,6 @@ app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   console.log('after', req.body.username);
   res.redirect('/urls');
-
 });
 
 
@@ -388,22 +367,6 @@ app.post("/login", (req, res) => {
   res.clearCookie("user_id");
   res.cookie('user_id', loggedUserId);
 
-  // const templateVars = {
-  //   user_id: req.cookies["user_id"],
-  //   user: users[loggedUserId],
-  //   email: users[loggedUserId].email
-  // };
-
-  // console.log(templateVars);
   res.redirect("/urls");
-  // users[user_id] = newUser;
-  // console.log(users);
-  // res.cookie('user_id', user_id);
 
-  // for (let eachUsr in users) {
-  //   console.log(users[eachUsr].email);
-  //   if (users[eachUsr].email === req.body.email) {
-
-  //   }
-  // }
 });
