@@ -1,10 +1,24 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const app = express();
-var cookieParser = require('cookie-parser')
-app.use(cookieParser());
+const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+// var cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 
+
+
+
+
+// app.use(cookieParser());
+
+
+// cookieSession example
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1'],
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 
 
@@ -82,12 +96,12 @@ const urlsForUserID = function (currentCookieID) {
 // '/urls'
 //http://www.localhost:8080/urls
 app.get("/urls", (req, res) => {
-  let currentCookieID = req.cookies["user_id"];
+  let currentCookieID = req.session.user_id;
   console.log('urls currentCookieID', currentCookieID);
   console.log('users ', users);
   if (users[currentCookieID]) {
     let templateVars = {
-      username: req.cookies["user_id"],
+      username: req.session.user_id,
       urls: urlDatabase,
       user: currentCookieID,
       email: users[currentCookieID].email
@@ -106,11 +120,11 @@ app.get("/urls", (req, res) => {
 //urls_new for create New URL
 app.get("/urls/new", (req, res) => {
   //if no id, go '/login'
-  let currentCookieID = req.cookies["user_id"];
+  let currentCookieID = req.session.user_id;
   if (users[currentCookieID]) {
 
     let templateVars = {
-      user: req.cookies["user_id"],
+      user: req.session.user_id,
       email: users[currentCookieID].email,
       urls: urlDatabase,
       shortURL: 'b2xVn2',
@@ -124,11 +138,11 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  let currentCookieID = req.cookies["user_id"];
+  let currentCookieID = req.session.user_id;
   // if current cookie user_id = urlDatabase[:shortUTR].userID
   if (users[currentCookieID] === urlDatabase[req.params.shortURL].userID) {
     let templateVars = {
-      user: req.cookies["user_id"],
+      user: req.session.user_id,
       email: users[currentCookieID].email,
       shortURL: 'b2xVn2',
       longURL: '9sm5xK'
@@ -140,9 +154,9 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:longURL", (req, res) => {
-  let currentCookieID = req.cookies["user_id"];  
+  let currentCookieID = req.session.user_id;  
   let templateVars = {
-      user: req.cookies["user_id"],
+      user: req.session.user_id,
       email: users[currentCookieID].email,
       shortURL: 'b2xVn2',
       longURL: '9sm5xK'
@@ -191,7 +205,7 @@ app.post("/urls", (req, res) => {
   // urlDatabase[shortURL].userID = userID same as current cookie id
   
   // urlDatabase[randomShortURL].longURL = receivedLongURL;
-  let currentCookieID = req.cookies["user_id"];
+  let currentCookieID = req.session.user_id;
   // urlDatabase[randomShortURL].userID = currentCookieID;
 
   urlDatabase[randomShortURL] = {
@@ -261,7 +275,7 @@ Login Cookies
 app.post("/logout", (req, res) => {
 
   console.log('before', req.body.username);
-  res.clearCookie("user_id");
+  req.session = null;
   console.log('after', req.body.username);
   res.redirect('/urls');
 });
@@ -271,13 +285,13 @@ app.post("/logout", (req, res) => {
 
 // register - GET
 app.get("/register", (req, res) => {
-  let currentCookieID = req.cookies["user_id"];
+  let currentCookieID = req.session.user_id;
   if (users[currentCookieID]) {
     
-    console.log('req.cookies["user_id"]', req.cookies["user_id"]);
+    console.log('req.session.user_id', req.session.user_id);
     console.log('users', users);
     let templateVars = {
-      user: req.cookies["user_id"],
+      user: req.session.user_id,
       email: users[currentCookieID].email,
       urls: urlDatabase
     }
@@ -332,7 +346,10 @@ app.post("/register/process", (req, res) => {
   }
   users[user_id] = newUser;
   console.log(users);
-  res.cookie('user_id', user_id);
+  
+  // Send user_id as cookie to browser (fixed to cookie-session)
+  // res.cookie('user_id', user_id);
+  req.session.user_id = user_id;  
   res.redirect("/urls");
 });
 
@@ -374,9 +391,11 @@ app.post("/login", (req, res) => {
     // return res.status(403).send(`<h1>Please enter email and password.</h1>`);
     return res.status(403).send('<h2>Not matched passward<h2>');
   }
-  res.clearCookie("user_id");
-  res.cookie('user_id', loggedUserId);
-
+  //changed cookie parser to cookie session
+  // res.clearCookie("user_id");
+  req.session.user_id = null;
+  //res.cookie('user_id', loggedUserId);
+  req.session.user_id = loggedUserId;
   res.redirect("/urls");
 
 });
