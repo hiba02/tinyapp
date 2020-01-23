@@ -56,20 +56,20 @@ app.listen(PORT, () => {
 
 //http://www.localhost:8080/urls
 app.get("/urls", (req, res) => {
-  let currentCookieID = req.cookies["username"];
+  let currentCookieID = req.cookies["user_id"];
   console.log('urls currentCookieID', currentCookieID);
   if (currentCookieID) {
 
     let currentEmail = users[currentCookieID].email
     let templateVars = {
-      username: req.cookies["username"],
+      username: req.cookies["user_id"],
       urls: urlDatabase,
       user: currentCookieID,
       email: currentEmail
     };
     console.log('currentCookieID:  ', currentCookieID);
     console.log("/ruls req.body ", users[currentCookieID]);
-    console.log("req.cookies[username].email", users[currentCookieID].email);
+    console.log("req.cookies[user_id].email", users[currentCookieID].email);
     res.render("urls_index", templateVars);
   } else {
     console.log('currentCookieID: ', currentCookieID);
@@ -91,9 +91,9 @@ app.get("/urls", (req, res) => {
 
 //urls_new for create New URL
 app.get("/urls/new", (req, res) => {
-  let currentCookieID = req.cookies["username"];
+  let currentCookieID = req.cookies["user_id"];
   let templateVars = {
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     urls: urlDatabase,
     user: currentCookieID,
     email: users[currentCookieID].email,
@@ -105,9 +105,9 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  let currentCookieID = req.cookies["username"];
+  let currentCookieID = req.cookies["user_id"];
   let templateVars = {
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     urls: urlDatabase,
     user: currentCookieID,
     email: users[currentCookieID].email,
@@ -119,7 +119,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/urls/:longURL", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     urls: urlDatabase,
     user: currentCookieID,
     email: users[currentCookieID].email,
@@ -172,7 +172,7 @@ app.post("/urls/:shortURL", (req, res) => {
   // console.log("req.params.shortURL", req.params.shortURL);
 
   let templateVars = {
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
@@ -210,8 +210,9 @@ app.post("/logout", (req, res) => {
   // console.log('Cookies: ', res.cookies);
   // // res.cookie(req.body);
   // res.cookie('username', req.body.username);
+  //const user_id = req.cookies["user_id"];
   console.log('before', req.body.username);
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   console.log('after', req.body.username);
   res.redirect('/urls');
 
@@ -223,13 +224,13 @@ app.post("/logout", (req, res) => {
 // register - GET
 app.get("/register", (req, res) => {
   let templateVars = {
-    user: req.cookies["username"],
+    user: req.cookies["user_id"],
     urls: urlDatabase
   };
-  console.log("req.cookies['username']", req.cookies["username"]);
+  console.log("req.cookies['user_id']", req.cookies["user_id"]);
 
-  if (templateVars["username"]) {
-    console.log(templateVars["username"]);
+  if (templateVars["user_id"]) {
+    console.log(templateVars["user_id"]);
   } else {
     console.log('hi');
   }
@@ -262,17 +263,17 @@ app.post("/register/process", (req, res) => {
     return res.status(404).send(`<h1>Please enter email and password.</h1>`);
   }
 
-  let newUserID = generateRandomString();
+  let user_id = generateRandomString();
   let newUser;
   newUser = {
-    id: newUserID,
+    id: user_id,
     email: req.body.email,
     password: req.body.password
   }
 
-  users[newUserID] = newUser;
+  users[user_id] = newUser;
   console.log(users);
-  res.cookie('username', newUserID);
+  res.cookie('user_id', user_id);
 
   // for (let eachUsr in users) {
   //   console.log(users[eachUsr].email);
@@ -289,33 +290,33 @@ app.post("/register/process", (req, res) => {
 app.get("/login", (req, res) => {
   
   
-  if (req.cookies["username"]) {
-    const currentCookieID = req.cookies["username"];
+  if (req.cookies["user_id"]) {
+    const currentCookieID = req.cookies["user_id"];
     
     console.log('login currentCookieID', currentCookieID);
     console.log('login users', users);
     const currentEmail = users[currentCookieID].email
-    // let newUserID = generateRandomString();
+    // let user_id = generateRandomString();
     // let newUser;
     // newUser = {
-    //   id: newUserID,
+    //   id: user_id,
     //   email: req.body.email,
     //   password: req.body.password
     // }
     
     const templateVars = {
-      username: req.cookies["username"],
+      username: req.cookies["user_id"],
       user: currentCookieID,
       email: currentEmail
     };
     console.log('login currentCookieID', currentCookieID);
     console.log('currentCookieID:  ', currentCookieID);
     console.log("/login req.body ", users[currentCookieID]);
-    console.log("req.cookies[username].email", users[currentCookieID].email);
+    console.log("req.cookies[user_id].email", users[currentCookieID].email);
     console.log("/login templateVar", templateVars);
     res.render("urls_login", templateVars);
   } else {
-    console.log('login GET else req.cookies["username"]: ', req.cookies["username"]);
+    console.log('login GET else req.cookies["user_id"]: ', req.cookies["user_id"]);
     res.redirect("urls_login");
   }
 });
@@ -342,19 +343,20 @@ app.post("/login", (req, res) => {
     // return res.status(403).send(`<h1>Please enter email and password.</h1>`);
     return res.status(403).send('<h2>Not matched passward<h2>');
   }
-  
+  res.clearCookie("user_id");
+  res.cookie('user_id', loggedUserId);
 
   // const templateVars = {
-  //   username: req.cookies["username"],
+  //   user_id: req.cookies["user_id"],
   //   user: users[loggedUserId],
   //   email: users[loggedUserId].email
   // };
 
   // console.log(templateVars);
   res.redirect("/urls");
-  // users[newUserID] = newUser;
+  // users[user_id] = newUser;
   // console.log(users);
-  // res.cookie('username', newUserID);
+  // res.cookie('user_id', user_id);
 
   // for (let eachUsr in users) {
   //   console.log(users[eachUsr].email);
