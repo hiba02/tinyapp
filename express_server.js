@@ -9,6 +9,33 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
+
+const urlDatabase = {
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com"
+};
+
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+
+
 //https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 const generateRandomString = function() {
   let result           = '';
@@ -20,14 +47,8 @@ const generateRandomString = function() {
   return result;
 };
 
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -35,18 +56,25 @@ app.listen(PORT, () => {
 
 //http://www.localhost:8080/urls
 app.get("/urls", (req, res) => {
-
+  let currentCookieID = req.cookies["username"];
+  let currentEmail = users[currentCookieID].email
   let templateVars = { 
     username: req.cookies["username"],
-    urls: urlDatabase 
+    urls: urlDatabase, 
+    user: currentCookieID,
+    email: currentEmail
   };
-  console.log("req.cookies['username']", req.cookies["username"]);
+  console.log('users', users)
+  //console.log('users[currentCookieID].email', users[currentCookieID].email)
+  console.log('currentCookieID:  ', currentCookieID);
+  console.log("/ruls req.body ", users[currentCookieID]);
+  console.log("req.cookies[username].email", users[currentCookieID].email);
 
-  if(templateVars["username"]) {
-    console.log(templateVars["username"]);
-  } else {
-    console.log('hi');
-  }
+  // if(templateVars["username"]) {
+  //   console.log(templateVars["username"]);
+  // } else {
+  //   console.log('hi');
+  // }
  
   res.render("urls_index", templateVars);
 });
@@ -54,8 +82,12 @@ app.get("/urls", (req, res) => {
 
 //urls_new for create New URL
 app.get("/urls/new", (req, res) => {
+  let currentCookieID = req.cookies["username"];
   let templateVars = {
     username: req.cookies["username"],
+    urls: urlDatabase, 
+    user: currentCookieID,
+    email: users[currentCookieID].email,
     shortURL: 'b2xVn2',
     longURL: '9sm5xK'
   };
@@ -64,8 +96,12 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
+  let currentCookieID = req.cookies["username"];
   let templateVars = {
     username: req.cookies["username"],
+    urls: urlDatabase, 
+    user: currentCookieID,
+    email: users[currentCookieID].email,
     shortURL: 'b2xVn2',
     longURL: '9sm5xK'
   };
@@ -75,6 +111,9 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls/:longURL", (req, res) => {
   let templateVars = {
     username: req.cookies["username"],
+    urls: urlDatabase, 
+    user: currentCookieID,
+    email: users[currentCookieID].email,
     urls: urlDatabase, 
     shortURL: 'b2xVn2',
     longURL: '9sm5xK'
@@ -170,6 +209,123 @@ app.post("/logout", (req, res) => {
 });
 
 
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
+
+
+// register - GET
+app.get("/register", (req, res) => {
+  let templateVars = { 
+    user: req.cookies["username"],
+    urls: urlDatabase 
+  };
+  console.log("req.cookies['username']", req.cookies["username"]);
+
+  if(templateVars["username"]) {
+    console.log(templateVars["username"]);
+  } else {
+    console.log('hi');
+  }
+  res.render("urls_register", templateVars);
+});
+
+
+/* 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+*/
+
+// register - POST
+// produce new user ID and put it in usrs object
+// send cookie with new user ID
+// if -> check email exist or not
+app.post("/register/process", (req, res) => {
+  if (!req.body.email ||!req.body.password) {
+    console.log(req.body.email);
+    return res.status(404).send(`<h1>Please enter email and password.</h1>`);
+  }
+  
+  let newUserID = generateRandomString();
+  let newUser;
+  newUser = {
+    id: newUserID,
+    email: req.body.email,
+    password: req.body.password
+  }
+  
+  users[newUserID] = newUser;
+  console.log(users);
+  res.cookie('username', newUserID);
+  
+  // for (let eachUsr in users) {
+  //   console.log(users[eachUsr].email);
+  //   if (users[eachUsr].email === req.body.email) {
+
+  //   }
+  // }
+
+  res.redirect("/urls");
+
+});
+
+/* login GET */
+app.get("/login", (req, res) => {
+  let currentCookieID = req.cookies["username"];
+  let currentEmail = users[currentCookieID].email;
+  console.log('currentCookieID: ', currentCookieID);
+  console.log('currentEmail: ', currentEmail);
+
+  let templateVars = { 
+    username: req.cookies["username"],
+    urls: urlDatabase, 
+    user: currentCookieID,
+    email: currentEmail
+  };
+
+  // if(templateVars["username"]) {
+  //   console.log(templateVars["username"]);
+  // } else {
+  //   console.log('hi');
+  // }
+  res.render("urls_login", templateVars);
+});
+
+
+
+/* login POST */
+app.post("/login", (req, res) => {
+  if (!req.body.email ||!req.body.password) {
+    console.log(req.body.email);
+    return res.status(404).send(`<h1>Please enter email and password.</h1>`);
+  }
+  
+  let newUserID = generateRandomString();
+  let newUser;
+  newUser = {
+    id: newUserID,
+    email: req.body.email,
+    password: req.body.password
+  }
+  
+  users[newUserID] = newUser;
+  console.log(users);
+  res.cookie('username', newUserID);
+  
+  // for (let eachUsr in users) {
+  //   console.log(users[eachUsr].email);
+  //   if (users[eachUsr].email === req.body.email) {
+
+  //   }
+  // }
+
+  res.redirect("/urls");
+
+});
