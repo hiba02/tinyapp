@@ -322,24 +322,39 @@ app.get("/login", (req, res) => {
 
 
 
-/* login POST */
+/* login POST - Update the Login Handler
+match email address
+*/
 app.post("/login", (req, res) => {
   if (!req.body.email || !req.body.password) {
     console.log(req.body.email);
-    return res.status(404).send(`<h1>Please enter email and password.</h1>`);
+    return res.status(404).send(`<h2>Please enter email and password.</h2>`);
   }
-
-  let newUserID = generateRandomString();
-  let newUser;
-  newUser = {
-    id: newUserID,
-    email: req.body.email,
-    password: req.body.password
+  console.log('req.body.email, req.body.password', req.body.email, req.body.password)
+  console.log('/login Post usrs: ', users);
+  let loggedUserId = '';
+  for (const eachUsr in users) {  
+    if (users[eachUsr].email === req.body.email && users[eachUsr].password === req.body.password) {
+      loggedUserId = eachUsr;
+    }
   }
+  if (!loggedUserId) {
+    // return res.status(403).send(`<h1>Please enter email and password.</h1>`);
+    return res.status(403).send('<h2>Not matched passward<h2>');
+  }
+  
 
-  users[newUserID] = newUser;
-  console.log(users);
-  res.cookie('username', newUserID);
+  // const templateVars = {
+  //   username: req.cookies["username"],
+  //   user: users[loggedUserId],
+  //   email: users[loggedUserId].email
+  // };
+
+  // console.log(templateVars);
+  res.redirect("/urls");
+  // users[newUserID] = newUser;
+  // console.log(users);
+  // res.cookie('username', newUserID);
 
   // for (let eachUsr in users) {
   //   console.log(users[eachUsr].email);
@@ -347,7 +362,4 @@ app.post("/login", (req, res) => {
 
   //   }
   // }
-
-  res.redirect("/urls");
-
 });
