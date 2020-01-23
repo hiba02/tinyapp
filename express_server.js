@@ -78,7 +78,8 @@ const urlsForUserID = function (currentCookieID) {
 app.get("/urls", (req, res) => {
   let currentCookieID = req.cookies["user_id"];
   console.log('urls currentCookieID', currentCookieID);
-  if (req.cookies["user_id"]) {
+  console.log('users ', users);
+  if (users[currentCookieID]) {
     let templateVars = {
       username: req.cookies["user_id"],
       urls: urlDatabase,
@@ -86,9 +87,7 @@ app.get("/urls", (req, res) => {
       email: users[currentCookieID].email
     };
     urlsForUserID(currentCookieID);
-    // console.log('currentCookieID:  ', currentCookieID);
-    // console.log("/ruls req.body ", users[currentCookieID]);
-    // console.log("req.cookies[user_id].email", users[currentCookieID].email);
+
     res.render("urls_index", templateVars);
   } else {
     console.log('currentCookieID: ', currentCookieID);
@@ -101,16 +100,21 @@ app.get("/urls", (req, res) => {
 //urls_new for create New URL
 app.get("/urls/new", (req, res) => {
   // let currentCookieID = req.cookies["user_id"];
-  // let templateVars = {
-  //   user: req.cookies["user_id"],
-  //   email: users[currentCookieID].email,
-  //   shortURL: 'b2xVn2',
-  //   longURL: '9sm5xK'
-  // };
-  // res.render("urls_new", templateVars);
+  // console.log('urls currentCookieID', currentCookieID);
+  // console.log('users ', users);
+  // if (users[currentCookieID]) {
+  //   let templateVars = {
+  //     username: req.cookies["user_id"],
+  //     urls: urlDatabase,
+  //     user: currentCookieID,
+  //     email: users[currentCookieID].email
+  //   };
+  //   urlsForUserID(currentCookieID);
 
-  if (req.cookies["user_id"]) {
-    let currentCookieID = req.cookies["user_id"];
+    // res.render("urls_index", templateVars);
+  let currentCookieID = req.cookies["user_id"];
+  if (users[currentCookieID]) {
+
     let templateVars = {
       user: req.cookies["user_id"],
       email: users[currentCookieID].email,
@@ -120,14 +124,16 @@ app.get("/urls/new", (req, res) => {
     }
     res.render("urls_new", templateVars);
   } else {
-    let templateVars = {
-      user: false,
-      email: null,
-      urls: urlDatabase,
-      shortURL: 'b2xVn2',
-      longURL: '9sm5xK'
-    }
-    res.render("urls_new", templateVars);
+    // let templateVars = {
+    //   user: false,
+    //   email: null,
+    //   urls: urlDatabase,
+    //   shortURL: 'b2xVn2',
+    //   longURL: '9sm5xK'
+    // }
+
+    // res.render("urls_new", templateVars);
+    res.redirect('/login');
   }
 
 
@@ -229,11 +235,7 @@ Login Cookies
 Login Cookies
 */
 app.post("/logout", (req, res) => {
-  // console.log('req.body: ', req.body);
-  // console.log('Cookies: ', res.cookies);
-  // // res.cookie(req.body);
-  // res.cookie('username', req.body.username);
-  //const user_id = req.cookies["user_id"];
+
   console.log('before', req.body.username);
   res.clearCookie("user_id");
   console.log('after', req.body.username);
@@ -246,8 +248,9 @@ app.post("/logout", (req, res) => {
 
 // register - GET
 app.get("/register", (req, res) => {
-  if (req.cookies["user_id"]) {
-    let currentCookieID = req.cookies["user_id"];
+  let currentCookieID = req.cookies["user_id"];
+  if (users[currentCookieID]) {
+    
     console.log('req.cookies["user_id"]', req.cookies["user_id"]);
     console.log('users', users);
     let templateVars = {
@@ -265,13 +268,6 @@ app.get("/register", (req, res) => {
     res.render("urls_register", templateVars);
   }
 
-
-
-  // if (templateVars["user_id"]) {
-  //   console.log(templateVars["user_id"]);
-  // } else {
-  //   console.log('hi');
-  // }
   
 });
 
@@ -313,13 +309,6 @@ app.post("/register/process", (req, res) => {
   console.log(users);
   res.cookie('user_id', user_id);
 
-  // for (let eachUsr in users) {
-  //   console.log(users[eachUsr].email);
-  //   if (users[eachUsr].email === req.body.email) {
-
-  //   }
-  // }
-
   res.redirect("/urls");
 
 });
@@ -336,39 +325,7 @@ app.get("/login", (req, res) => {
 
   res.render("urls_login", templateVars);   
   
-  
-  // if (req.cookies["user_id"]) {
-  //   const currentCookieID = req.cookies["user_id"];
-    
-  //   console.log('login currentCookieID', currentCookieID);
-  //   console.log('login users', users);
-  //   const currentEmail = users[currentCookieID].email
-    // let user_id = generateRandomString();
-    // let newUser;
-    // newUser = {
-    //   id: user_id,
-    //   email: req.body.email,
-    //   password: req.body.password
-    // }
-    
-  //   const templateVars = {
-  //     username: req.cookies["user_id"],
-  //     user: currentCookieID,
-  //     email: currentEmail
-  //   };
-  //   console.log('login currentCookieID', currentCookieID);
-  //   console.log('currentCookieID:  ', currentCookieID);
-  //   console.log("/login req.body ", users[currentCookieID]);
-  //   console.log("req.cookies[user_id].email", users[currentCookieID].email);
-  //   console.log("/login templateVar", templateVars);
-  //   res.render("urls_login", templateVars);
-  // } else {
-  //   console.log('login GET else req.cookies["user_id"]: ', req.cookies["user_id"]);
-  //   res.redirect("urls_login");
-  // }
 });
-
-
 
 /* login POST - Update the Login Handler
 match email address
