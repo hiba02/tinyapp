@@ -135,6 +135,8 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let currentCookieID = req.cookies["user_id"];
+  // if current cookie user_id = uurlDatabase[:shortUTR].userID
+  if (users[currentCookieID] === urlDatabase[req.params.shortURL].userID) {
     let templateVars = {
       user: req.cookies["user_id"],
       email: users[currentCookieID].email,
@@ -142,6 +144,9 @@ app.get("/urls/:shortURL", (req, res) => {
       longURL: '9sm5xK'
     };
     res.render("urls_show", templateVars);
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 app.get("/urls/:longURL", (req, res) => {
