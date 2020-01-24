@@ -4,8 +4,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 // var cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
-
-
+const getUserByEmail = require ('./helpers.js');
 
 
 
@@ -62,6 +61,19 @@ const users = {
     password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
+
+
+
+
+
+
+
+console.log(getUserByEmail("user3@example.com", users));
+
+
+
+
+
 
 
 
